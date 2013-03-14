@@ -186,4 +186,15 @@ describe OpeningHours do
 
   end
 
+  context "check accessors" do
+    before do
+      @hours = OpeningHours.new("9:00 AM", "3:00 PM", "Europe/Moscow")
+    end
+
+    it "should respond to human readable times" do
+      @hours.week[:mon].open.to_human_readable_hours == "09:00 AM"      
+      @hours.week[:mon].close.to_human_readable_hours == "03:00 PM"      
+    end
+  end
+
 end

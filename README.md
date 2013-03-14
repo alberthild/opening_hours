@@ -46,6 +46,22 @@ Check if business is open right now:
 hours.now_open?
 ```
 
+And get all week days with values:
+```ruby
+hours.week.each do |day|
+  puts day[1].open
+end
+```
+
+Get human readable opening/close hours
+```ruby
+hours.week[:mon].open.to_human_readable_hours
+ => "09:00 AM" 
+
+hours.week[:mon].close.to_human_readable_hours
+ => "03:00 PM" 
+```
+
 ## Contributing
 
 1. Fork it

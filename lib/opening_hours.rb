@@ -119,3 +119,11 @@ class OpeningHours
   end
 
 end
+
+class Fixnum
+  def to_human_readable_hours
+    t = Time.local(Date.today.year, Date.today.month, Date.today.day)
+    t += self.seconds
+    t.strftime("%I:%M %p")
+  end
+end
