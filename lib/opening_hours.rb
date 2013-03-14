@@ -120,7 +120,7 @@ class OpeningHours
 
 end
 
-class Fixnum
+Fixnum.class_eval do
   def to_human_readable_hours
     t = Time.local(Date.today.year, Date.today.month, Date.today.day)
     t += self.seconds
