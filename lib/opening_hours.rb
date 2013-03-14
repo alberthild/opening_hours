@@ -20,9 +20,9 @@ class OpeningHours
     CLOSED = new(0, 0)
 
     def self.parse(open, close)
-      open  = Time.parse(open)
-      close = Time.parse(close)
-    
+      open  = Time.zone.parse(open)
+      close = Time.zone.parse(close)
+
       open  = TimeUtils::seconds_from_midnight(open)
       close = TimeUtils::seconds_from_midnight(close)
     
@@ -58,10 +58,10 @@ class OpeningHours
 
   WEEK_DAYS = Time::RFC2822_DAY_NAME.map { |m| m.downcase.to_sym }
 
-  def initialize(start_time, end_time, time_zone = Time.now.gmt_offset)
-    open_hours = OpenHours.parse(start_time, end_time)
+  def initialize(start_time, end_time, time_zone = 'Europe/London')
+    Time.zone = time_zone
 
-    @time_zone = time_zone
+    open_hours = OpenHours.parse(start_time, end_time)
 
     @week = {}
     WEEK_DAYS.each do |day|
@@ -71,10 +71,7 @@ class OpeningHours
     @specific_days = {}
   end
 
-  def update(day, start_time, end_time, time_zone = Time.now.zone)
-
-    @time_zone = time_zone
-
+  def update(day, start_time, end_time)
     set_open_hours day, OpenHours.parse(start_time, end_time)
   end
 
@@ -89,7 +86,6 @@ class OpeningHours
   end
 
   def calculate_deadline(job_duration, start_date_time)
-    Time.zone = @time_zone
     start_date_time = Time.zone.parse(start_date_time)
 
     today = Date.civil(start_date_time.year, start_date_time.month, start_date_time.day)
@@ -122,12 +118,4 @@ class OpeningHours
     end
   end
 
-end
-
-class Time
-  class << self
-    def parse_rfc822(date, now=self.now)
-      parse(date, now).to_formatted_s(:rfc822)
-    end
-  end
 end

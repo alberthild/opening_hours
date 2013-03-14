@@ -14,30 +14,30 @@ describe OpeningHours do
   it { should respond_to(:week) }
 
   context "schedule without exceptions" do
-    before { @hours = OpeningHours.new("9:00 AM", "3:00 PM") }
+    before { @hours = OpeningHours.new("9:00 AM", "3:00 PM", "Europe/Berlin") }
 
     it "should handle start time during open hours" do
-      @hours.calculate_deadline(1*60*60, "Jun 7, 2010 9:10 AM").should == Time.parse_rfc822("Jun 7, 2010 10:10 AM")
+      @hours.calculate_deadline(1*60*60, "Jun 7, 2010 9:10 AM").should == Time.zone.parse("Jun 7, 2010 10:10 AM").to_formatted_s(:rfc822)
     end
 
     it "should handle start time before open hours" do
-      @hours.calculate_deadline(2*60*60, "Jun 7, 2010 8:45 AM").should == Time.parse_rfc822("Jun 7, 2010 11:00 AM")
+      @hours.calculate_deadline(2*60*60, "Jun 7, 2010 8:45 AM").should == Time.zone.parse("Jun 7, 2010 11:00 AM").to_formatted_s(:rfc822)
     end
 
     it "should handle start time after open hours" do
-      @hours.calculate_deadline(2*60*60, "Jun 7, 2010 10:45 PM").should == Time.parse_rfc822("Jun 8, 2010 11:00 AM")
+      @hours.calculate_deadline(2*60*60, "Jun 7, 2010 10:45 PM").should == Time.zone.parse("Jun 8, 2010 11:00 AM").to_formatted_s(:rfc822)
     end
 
     it "should finish job next day if not enough time left" do
-      @hours.calculate_deadline(2*60*60, "Jun 7, 2010 2:45 PM").should == Time.parse_rfc822("Jun 8, 2010 10:45 AM")
+      @hours.calculate_deadline(2*60*60, "Jun 7, 2010 2:45 PM").should == Time.zone.parse("Jun 8, 2010 10:45 AM").to_formatted_s(:rfc822)
     end
 
     it "should process huge job for several days" do
-      @hours.calculate_deadline(20*60*60, "Jun 7, 2010 10:45 AM").should == Time.parse_rfc822("Jun 10, 2010 12:45 PM")
+      @hours.calculate_deadline(20*60*60, "Jun 7, 2010 10:45 AM").should == Time.zone.parse("Jun 10, 2010 12:45 PM").to_formatted_s(:rfc822)
     end
 
     it "should flip the edge" do
-      @hours.calculate_deadline(6*60*60, "Jun 7, 2010 9:00 AM").should == Time.parse_rfc822("Jun 8, 2010 9:00 AM")
+      @hours.calculate_deadline(6*60*60, "Jun 7, 2010 9:00 AM").should == Time.zone.parse("Jun 8, 2010 9:00 AM").to_formatted_s(:rfc822)
     end
 
     # this is also possible, but I prefer previous variant
@@ -49,19 +49,19 @@ describe OpeningHours do
     context "on dst changes" do
 
       it "should respect changing to dst" do
-        @hours.calculate_deadline(8*60*60, "March 27, 2010 2:00 PM").should == Time.parse_rfc822("March 29, 2010 10:00 AM")
+        @hours.calculate_deadline(8*60*60, "March 27, 2010 2:00 PM").should == Time.zone.parse("March 29, 2010 10:00 AM").to_formatted_s(:rfc822)
       end
 
       it "should respect changing to dst" do
-        @hours.calculate_deadline(2*60*60, "March 27, 2010 2:00 PM").should == Time.parse_rfc822("March 28, 2010 10:00 AM")
+        @hours.calculate_deadline(2*60*60, "March 27, 2010 2:00 PM").should == Time.zone.parse("March 28, 2010 10:00 AM").to_formatted_s(:rfc822)
       end
 
       it "should respect changing from dst" do
-        @hours.calculate_deadline(8*60*60, "October 31, 2010 2:00 PM").should == Time.parse_rfc822("November 2, 2010 10:00 AM")
+        @hours.calculate_deadline(8*60*60, "October 31, 2010 2:00 PM").should == Time.zone.parse("November 2, 2010 10:00 AM").to_formatted_s(:rfc822)
       end
 
       it "should respect changing from dst" do
-        @hours.calculate_deadline(2*60*60, "October 31, 2010 2:00 PM").should == Time.parse_rfc822("November 1, 2010 10:00 AM")
+        @hours.calculate_deadline(2*60*60, "October 31, 2010 2:00 PM").should == Time.zone.parse("November 1, 2010 10:00 AM").to_formatted_s(:rfc822)
       end
 
     end
@@ -75,11 +75,11 @@ describe OpeningHours do
     end
 
     it "should skip closed days" do
-      @hours.calculate_deadline(2*60*60, "Jun 5, 2010 2:45 PM").should == Time.parse_rfc822("Jun 7, 2010 10:45 AM")
+      @hours.calculate_deadline(2*60*60, "Jun 5, 2010 2:45 PM").should == Time.zone.parse("Jun 7, 2010 10:45 AM").to_formatted_s(:rfc822)
     end
 
     it "should skip closed days even if work scheduled to closed day" do
-      @hours.calculate_deadline(2*60*60, "Jun 6, 2010 11:45 AM").should == Time.parse_rfc822("Jun 7, 2010 11:00 AM")
+      @hours.calculate_deadline(2*60*60, "Jun 6, 2010 11:45 AM").should == Time.zone.parse("Jun 7, 2010 11:00 AM").to_formatted_s(:rfc822)
     end
   end
 
@@ -91,11 +91,11 @@ describe OpeningHours do
     end
 
     it "should skip closed days" do
-      @hours.calculate_deadline(2*60*60, "Dec 24, 2010 2:45 PM").should == Time.parse_rfc822("Dec 26, 2010 10:45 AM")
+      @hours.calculate_deadline(2*60*60, "Dec 24, 2010 2:45 PM").should == Time.zone.parse("Dec 26, 2010 10:45 AM").to_formatted_s(:rfc822)
     end
 
     it "should skip closed days even if work scheduled to closed day" do
-      @hours.calculate_deadline(2*60*60, "Dec 25, 2010 11:45 AM").should == Time.parse_rfc822("Dec 26, 2010 11:00 AM")
+      @hours.calculate_deadline(2*60*60, "Dec 25, 2010 11:45 AM").should == Time.zone.parse("Dec 26, 2010 11:00 AM").to_formatted_s(:rfc822)
     end
 
   end
@@ -108,7 +108,7 @@ describe OpeningHours do
     end
 
     it "should skip closed days" do
-      @hours.calculate_deadline(2*60*60, "Dec 24, 2010 2:45 PM").should == Time.parse_rfc822("Dec 27, 2010 10:45 AM")
+      @hours.calculate_deadline(2*60*60, "Dec 24, 2010 2:45 PM").should == Time.zone.parse("Dec 27, 2010 10:45 AM").to_formatted_s(:rfc822)
     end
   end
 
@@ -119,7 +119,7 @@ describe OpeningHours do
     end
 
     it "should spend open hours" do
-      @hours.calculate_deadline(14*60*60, "Jun 3, 2010 9:00 AM").should == Time.parse_rfc822("Jun 5, 2010 10:00 AM")
+      @hours.calculate_deadline(14*60*60, "Jun 3, 2010 9:00 AM").should == Time.zone.parse("Jun 5, 2010 10:00 AM").to_formatted_s(:rfc822)
     end
 
   end
@@ -131,11 +131,11 @@ describe OpeningHours do
     end
 
     it "should spend open hours" do
-      @hours.calculate_deadline(12*60*60, "Dec 23, 2010 9:00 AM").should == Time.parse_rfc822("Dec 25, 2010 10:00 AM")
+      @hours.calculate_deadline(12*60*60, "Dec 23, 2010 9:00 AM").should == Time.zone.parse("Dec 25, 2010 10:00 AM").to_formatted_s(:rfc822)
     end
 
     it "should spend open hours if started at the day" do
-      @hours.calculate_deadline(6*60*60, "Dec 24, 2010 12:00 PM").should == Time.parse_rfc822("Dec 25, 2010 2:00 PM")
+      @hours.calculate_deadline(6*60*60, "Dec 24, 2010 12:00 PM").should == Time.zone.parse("Dec 25, 2010 2:00 PM").to_formatted_s(:rfc822)
     end
 
   end
@@ -150,27 +150,30 @@ describe OpeningHours do
     end
 
     it "should pass test #1" do
-      @hours.calculate_deadline(2*60*60, "Jun 7, 2010 9:10 AM").should == Time.parse_rfc822("Mon Jun 07 11:10:00 2010")
+      @hours.calculate_deadline(2*60*60, "Jun 7, 2010 9:10 AM").should == Time.zone.parse("Mon Jun 07 11:10:00 2010").to_formatted_s(:rfc822)
     end
 
     it "should pass test #2" do
-      @hours.calculate_deadline(15*60, "Jun 8, 2010 2:48 PM").should == Time.parse_rfc822("Thu Jun 10 09:03:00 2010")
+      @hours.calculate_deadline(15*60, "Jun 8, 2010 2:48 PM").should == Time.zone.parse("Thu Jun 10 09:03:00 2010").to_formatted_s(:rfc822)
     end
 
     it "should pass test #3" do
-      @hours.calculate_deadline(7*60*60, "Dec 24, 2010 6:45 AM").should == Time.parse_rfc822("Mon Dec 27 11:00:00 2010")
+      @hours.calculate_deadline(7*60*60, "Dec 24, 2010 6:45 AM").should == Time.zone.parse("Mon Dec 27 11:00:00 2010").to_formatted_s(:rfc822)
     end
 
   end
 
   context "timezone checks" do
     before do
-      Time.zone = "Moscow"
-      @hours = OpeningHours.new("9:00 AM", "3:00 PM", "Moscow")
+      @hours = OpeningHours.new("9:00 AM", "3:00 PM", "Europe/Moscow")
     end
 
     it "should spend open hours in the right time zone" do
       @hours.calculate_deadline(2*60*60, "Dec 23, 2010 9:00 AM").should == Time.zone.parse("Dec 23, 2010 11:00 AM").to_formatted_s(:rfc822)
+    end
+
+    it "should spend open hours in the right time zone" do
+      @hours.calculate_deadline(2*60*60, "Dec 23, 2010 2:00 PM").should == Time.zone.parse("Dec 24, 2010 10:00 AM").to_formatted_s(:rfc822)
     end
 
     it "should spend open hours in the right time zone" do

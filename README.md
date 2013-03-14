@@ -20,7 +20,7 @@ Or install it yourself as:
 
 Init new hours object:
 ```ruby
-hours = OpeningHours.new("9:00 AM", "3:00 PM", "Berlin")
+hours = OpeningHours.new("9:00 AM", "3:00 PM", "Europe/Berlin")
 ```
 
 Methods to set the hours, closed times or holidays:
@@ -34,11 +34,11 @@ Calculate the deadline (next available working hour)
 ```ruby
 # offset and time
 hours.calculate_deadline(4*60*60, "Dec 23, 2010 8:00 PM")
- => "Fri, 24 Dec 2010 12:00:00 +0100" 
+  => "Fri, 24 Dec 2010 13:00:00 +0100" 
 
 # now with timezone
 hours.calculate_deadline(0, "Dec 23, 2010 9:00 AM -0400")
- => "Thu, 23 Dec 2010 14:00:00 +0100"
+  => "Thu, 23 Dec 2010 14:00:00 +0100" 
 ```
 
 Check if business is open right now:
