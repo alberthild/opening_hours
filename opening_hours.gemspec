@@ -10,7 +10,7 @@ Gem::Specification.new do |gem|
   gem.email         = ["mail@albert-hild.de"]
   gem.description   = %q{Opening hours for all kind of businesses}
   gem.summary       = %q{Let you apply opening hours, closed periods and holidays to all kind of business including timezone support. Heavily based on: https://gist.github.com/pleax/e9c0da1a6e92dd12cbc7 }
-  gem.homepage      = ""
+  gem.homepage      = "https://github.com/alberthild/opening_hours"
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
