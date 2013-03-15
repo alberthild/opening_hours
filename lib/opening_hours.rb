@@ -82,7 +82,7 @@ class OpeningHours
   end
 
   def now_open?
-    calculate_deadline(0, Time.now.to_s) == Time.now.to_formatted_s(:rfc822)
+    calculate_deadline(0, Time.zone.now.to_s) == Time.zone.now.to_formatted_s(:rfc822)
   end
 
   def calculate_deadline(job_duration, start_date_time)

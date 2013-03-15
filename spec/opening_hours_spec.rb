@@ -197,4 +197,30 @@ describe OpeningHours do
     end
   end
 
+  context "now_open" do
+    context "on open hours" do
+      before do 
+        open_time = Time.local(Date.today.year, Date.today.month, Date.today.day, Time.now.hour-1).strftime("%I:%M %p")
+        close_time = Time.local(Date.today.year, Date.today.month, Date.today.day, Time.now.hour+5).strftime("%I:%M %p")
+        @hours = OpeningHours.new(open_time, close_time, "Europe/Berlin")
+      end
+
+      it "should respond with right values" do
+        @hours.now_open?.should == true
+      end
+    end
+
+    context "on closed hours" do
+      before do 
+        open_time = Time.local(Date.today.year, Date.today.month, Date.today.day, Time.now.hour+1).strftime("%I:%M %p")
+        close_time = Time.local(Date.today.year, Date.today.month, Date.today.day, Time.now.hour+5).strftime("%I:%M %p")
+        @hours = OpeningHours.new(open_time, close_time, "Europe/Berlin")
+      end
+
+      it "should respond with right values" do
+        @hours.now_open?.should == false
+      end
+    end
+  end
+
 end
