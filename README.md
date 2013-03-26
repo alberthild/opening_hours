@@ -26,6 +26,7 @@ hours = OpeningHours.new("9:00 AM", "3:00 PM", "Europe/Berlin")
 Methods to set the hours, closed times or holidays:
 ```ruby
 hours.update :fri, "10:00 AM", "5:00 PM"
+hours.break :fri, "01:00 PM", "1:30 PM"
 hours.update "Dec 24, 2010", "8:00 AM", "1:00 PM"
 hours.closed :sun, :wed, "Dec 25, 2010"
 ```
@@ -60,6 +61,15 @@ hours.week[:mon].open.to_human_readable_hours
 
 hours.week[:mon].close.to_human_readable_hours
  => "03:00 PM" 
+```
+
+You can fetch breaks also. Sorry for confusion... but i used same OpeningHour class for breaks as for the original hours.. thats why the attributes here are open and close too. But actually .open and .close means when break starts and ends.
+```ruby
+hours.breaks[:fri].open.to_human_readable_hours
+ => "01:00 AM" 
+
+hours.breaks[:fri].close.to_human_readable_hours
+ => "01:30 PM" 
 ```
 
 ## Contributing
