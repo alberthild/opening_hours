@@ -54,7 +54,7 @@ class OpeningHours
   end
 
   # makes it possible to access each day like: b.week[:sun].open, or iterate through all weekdays
-  attr_reader :week
+  attr_reader :week, :breaks
 
   WEEK_DAYS = Time::RFC2822_DAY_NAME.map { |m| m.downcase.to_sym }
 
@@ -69,6 +69,7 @@ class OpeningHours
     end
 
     @specific_days = {}
+    @breaks = {}
   end
 
   def update(day, start_time, end_time)
@@ -81,6 +82,10 @@ class OpeningHours
     end
   end
 
+  def break(day, start_time, end_time)
+    set_break_hours day, OpenHours.parse(start_time, end_time)
+  end
+
   def now_open?
     calculate_deadline(0, Time.zone.now.to_s) == Time.zone.now.to_formatted_s(:rfc822)
   end
@@ -90,11 +95,17 @@ class OpeningHours
 
     today = Date.civil(start_date_time.year, start_date_time.month, start_date_time.day)
     open_hours = get_open_hours(today).offset(TimeUtils::seconds_from_midnight(start_date_time))
-
+    break_hours_duration = get_break_duration(today)
+    break_hours = get_break_hours(today)
     # here is possible to use strict greater operator if you want to stop on edge of previous business day.
     # see "BusinessHours schedule without exceptions should flip the edge" spec
-    while job_duration >= open_hours.duration
-      job_duration -= open_hours.duration
+
+    if open_hours.open + job_duration >= break_hours.open
+      job_duration += break_hours_duration
+    end
+
+    while job_duration >= (open_hours.duration - break_hours_duration)
+      job_duration -= open_hours.duration + break_hours_duration
 
       today = today.next
       open_hours = get_open_hours(today)
@@ -115,6 +126,24 @@ class OpeningHours
       @week[day] = open_hours
     when String
       @specific_days[Date.parse(day)] = open_hours
+    end
+  end
+
+  def get_break_hours(date)
+    @breaks[WEEK_DAYS[date.wday]] ||= OpenHours.new(0, 0)
+  end
+
+  def set_break_hours(day, break_hours)
+    case day
+    when Symbol
+      @breaks[day] = break_hours
+    end
+  end
+
+  def get_break_duration(date)
+    bhours = get_break_hours(date)
+    if bhours
+      bhours.close - bhours.open
     end
   end
 
