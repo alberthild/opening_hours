@@ -99,16 +99,17 @@ class OpeningHours
     break_hours = get_break_hours(today)
     # here is possible to use strict greater operator if you want to stop on edge of previous business day.
     # see "BusinessHours schedule without exceptions should flip the edge" spec
-
-    if open_hours.open + job_duration >= break_hours.open
-      job_duration += break_hours_duration
-    end
-
-    while job_duration >= (open_hours.duration - break_hours_duration)
-      job_duration -= open_hours.duration + break_hours_duration
+    
+    while job_duration >= open_hours.duration
+      job_duration -= open_hours.duration
 
       today = today.next
       open_hours = get_open_hours(today)
+      break_hours = get_break_hours(today)
+    end
+
+    if (open_hours.open + job_duration).between?(break_hours.open, break_hours.close)
+      job_duration += break_hours_duration
     end
 
     Time.zone.local(today.year, today.month, today.day, *TimeUtils::time_from_midnight(open_hours.open + job_duration)).to_formatted_s(:rfc822)

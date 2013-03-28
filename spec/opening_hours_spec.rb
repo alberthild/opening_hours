@@ -228,6 +228,8 @@ describe OpeningHours do
     before do
       @hours = OpeningHours.new("9:00 AM", "4:00 PM", "Europe/Moscow")
       @hours.break :fri, "01:00 PM", "01:30 PM"
+      @hours.break :sat, "01:00 PM", "01:30 PM"
+      @hours.break :sun, "01:25 PM", "01:55 PM"
     end
 
     it "should open at 1:30 pm after the break" do
@@ -241,6 +243,10 @@ describe OpeningHours do
     it "should open at 2:00 pm next day" do
       @hours.calculate_deadline(8*60*60, "Mar 22, 2013 01:00 PM +0400").should == Time.zone.parse("Mar 23, 2013 2:00 PM").to_formatted_s(:rfc822)
     end
+
+    it "should open at 1:30 pm next day" do
+      @hours.calculate_deadline(7*60*60, "Mar 22, 2013 01:00 PM +0400").should == Time.zone.parse("Mar 23, 2013 1:30 PM").to_formatted_s(:rfc822)
+    end
   end
 
   context "with breaks and now open" do
@@ -251,6 +257,21 @@ describe OpeningHours do
         close_time = Time.local(Date.today.year, Date.today.month, Date.today.day, Time.now.hour+5).strftime("%I:%M %p")
         break_start_time = Time.local(Date.today.year, Date.today.month, Date.today.day, Time.now.hour+1).strftime("%I:%M %p")
         break_end_time = Time.local(Date.today.year, Date.today.month, Date.today.day, Time.now.hour+2).strftime("%I:%M %p")
+        @hours = OpeningHours.new(open_time, close_time, "Europe/Berlin")
+        @hours.break OpeningHours::WEEK_DAYS[Date.today.wday], break_start_time, break_end_time
+      end
+
+      it "should should be open" do
+        @hours.now_open?.should == true
+      end
+    end
+
+    context "with currently not in break" do
+      before do
+        open_time = Time.local(Date.today.year, Date.today.month, Date.today.day, Time.now.hour-2).strftime("%I:%M %p")
+        close_time = Time.local(Date.today.year, Date.today.month, Date.today.day, Time.now.hour+5).strftime("%I:%M %p")
+        break_start_time = Time.local(Date.today.year, Date.today.month, Date.today.day, Time.now.hour-1).strftime("%I:%M %p")
+        break_end_time = Time.local(Date.today.year, Date.today.month, Date.today.day, Time.now.hour-1, 30).strftime("%I:%M %p")
         @hours = OpeningHours.new(open_time, close_time, "Europe/Berlin")
         @hours.break OpeningHours::WEEK_DAYS[Date.today.wday], break_start_time, break_end_time
       end
