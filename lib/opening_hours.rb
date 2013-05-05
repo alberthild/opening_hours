@@ -131,7 +131,7 @@ class OpeningHours
   end
 
   def get_break_hours(date)
-    @breaks[WEEK_DAYS[date.wday]] ||= OpenHours.new(0, 0)
+    @breaks.fetch(WEEK_DAYS[date.wday], OpenHours.new(0, 0))
   end
 
   def set_break_hours(day, break_hours)
