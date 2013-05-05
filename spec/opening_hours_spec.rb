@@ -45,6 +45,12 @@ describe OpeningHours do
     # it "should NOT flip the edge" do
     #   @hours.calculate_deadline(6*60*60, "Jun 7, 2010 9:00 AM").should == Time.parse("Jun 7, 2010 3:00 PM")
     # end
+    it 'should not add any breaks on batch update' do
+      { sun: ['10:00', '20:00'], mon: ['10:00', '20:00'], wed: ['10:00', '20:00'] }.each do |day_of_week, hours|
+          @hours.update day_of_week, hours.first, hours.second
+      end
+      @hours.breaks.should be_empty
+    end
 
     context "on dst changes" do
 
