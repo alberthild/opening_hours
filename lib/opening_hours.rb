@@ -100,7 +100,7 @@ class OpeningHours
     # here is possible to use strict greater operator if you want to stop on edge of previous business day.
     # see "BusinessHours schedule without exceptions should flip the edge" spec
     
-    while job_duration >= open_hours.duration
+    while job_duration >= open_hours.duration and open_hours.duration > 0
       job_duration -= open_hours.duration
 
       today = today.next
